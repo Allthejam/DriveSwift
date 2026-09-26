@@ -67,7 +67,7 @@ export default function PupilsPage() {
                 <TableCell>
                   <div className="flex items-center gap-4">
                     <Avatar className="hidden h-9 w-9 sm:flex">
-                      <AvatarImage src={`https://placehold.co/100x100.png?text=${pupil.avatar}`} />
+                      <AvatarImage src={pupil.avatarUrl || `https://placehold.co/100x100.png?text=${pupil.avatar}`} />
                       <AvatarFallback>{pupil.avatar}</AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">

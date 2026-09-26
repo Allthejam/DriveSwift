@@ -246,7 +246,7 @@ export default function PupilProfilePage() {
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <Avatar className="h-16 w-16">
-                                    <AvatarImage src={`https://placehold.co/100x100.png?text=${pupil.avatar}`} />
+                                    <AvatarImage src={pupil.avatarUrl || `https://placehold.co/100x100.png?text=${pupil.avatar}`} />
                                     <AvatarFallback>{pupil.avatar}</AvatarFallback>
                                 </Avatar>
                                 <div>

@@ -480,7 +480,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="relative group aspect-video rounded-lg overflow-hidden">
                             <Image
-                                src="https://placehold.co/600x400.png"
+                                src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80"
                                 alt="Instruction car"
                                 fill
                                 className="object-cover"

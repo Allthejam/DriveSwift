@@ -35,7 +35,7 @@ export default function PupilDashboardLayout({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                      <AvatarImage src={`https://placehold.co/100x100.png?text=${pupil.avatar}`} />
+                      <AvatarImage src={pupil.avatarUrl || `https://placehold.co/100x100.png?text=${pupil.avatar}`} />
                       <AvatarFallback>{pupil.avatar}</AvatarFallback>
                   </Avatar>
                   <span>{pupil.name}</span>

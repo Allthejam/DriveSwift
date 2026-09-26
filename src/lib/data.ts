@@ -94,6 +94,7 @@ export type Pupil = {
   email: string;
   phone: string;
   avatar: string;
+  avatarUrl?: string;
   address: Address;
   licenceNumber: string;
   theoryTest: TestAttempt[];
@@ -314,6 +315,7 @@ export let pupils: Pupil[] = [
     email: 'ben.stokes@example.com',
     phone: '07123123123',
     avatar: 'BS',
+    avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
     address: { line1: '123 Cricket Lane', city: 'Durham', postcode: 'DH1 1AA' },
     licenceNumber: 'STOKE123456BS9AB',
     theoryTest: [{ status: 'Passed', date: '2023-08-15T00:00:00.000Z', certificateNumber: '123456789' }],
@@ -327,6 +329,7 @@ export let pupils: Pupil[] = [
     email: 'chloe.kelly@example.com',
     phone: '07456456456',
     avatar: 'CK',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
     address: { line1: '456 Football Drive', city: 'Manchester', postcode: 'M1 1BB' },
     licenceNumber: 'KELLY456789CK9CD',
     theoryTest: [{ status: 'Booked', date: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString() }],
@@ -340,6 +343,7 @@ export let pupils: Pupil[] = [
     email: 'alice.walker@example.com',
     phone: '07789789789',
     avatar: 'AW',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
     address: { line1: '789 Novel Avenue', city: 'London', postcode: 'SE1 9FG' },
     licenceNumber: 'WALKE789012AW9EF',
     theoryTest: [{ status: 'Not Booked', date: null }],
@@ -388,7 +392,7 @@ export const trainingAids: TrainingAid[] = [
     id: 'ta1',
     title: 'Road Signs Handbook',
     description: 'A comprehensive guide to all UK road signs for the theory test.',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
     category: 'Theory',
     youtubeUrl: 'https://www.youtube.com/watch?v=__60i2A3pTs'
   },
@@ -396,7 +400,7 @@ export const trainingAids: TrainingAid[] = [
     id: 'ta2',
     title: 'Parallel Park Masterclass',
     description: 'Video tutorial demonstrating the perfect parallel park manoeuvre.',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=800&q=80',
     category: 'Manoeuvres',
     youtubeUrl: 'https://www.youtube.com/watch?v=L4x28-i3A6M',
   },
@@ -404,7 +408,7 @@ export const trainingAids: TrainingAid[] = [
     id: 'ta3',
     title: 'Hazard Perception Clips',
     description: 'Practice clips to improve your hazard perception skills.',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80',
     category: 'Theory',
     youtubeUrl: 'https://www.youtube.com/watch?v=J6e1G93Kq2w'
   },
@@ -412,7 +416,7 @@ export const trainingAids: TrainingAid[] = [
     id: 'ta4',
     title: 'Show Me, Tell Me Questions',
     description: 'A complete list of all official "Show Me, Tell Me" questions.',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80',
     category: 'Practical Test',
     youtubeUrl: 'https://www.youtube.com/watch?v=ubOIkY_kF-E'
   },

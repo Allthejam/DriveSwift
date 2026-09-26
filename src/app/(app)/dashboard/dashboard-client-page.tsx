@@ -51,7 +51,7 @@ function RecentFeedback({ instructorId, schoolId }: { instructorId: string, scho
                         <DialogTrigger asChild>
                             <button className="flex w-full text-left items-start gap-4 p-2 rounded-lg hover:bg-muted">
                                 <Avatar>
-                                    <AvatarImage src={`https://placehold.co/100x100.png?text=${pupil?.avatar}`} data-ai-hint="person portrait" />
+                                    <AvatarImage src={pupil?.avatarUrl || `https://placehold.co/100x100.png?text=${pupil?.avatar}`} data-ai-hint="person portrait" />
                                     <AvatarFallback>{pupil?.avatar}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-grow min-w-0">
@@ -122,7 +122,7 @@ function BookingRequests({ bookingRequests, onApprove }: { bookingRequests: Book
                     <div key={req.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-secondary/50 rounded-lg">
                         <div className="flex items-center gap-3 w-full">
                             <Avatar className="h-9 w-9">
-                            <AvatarImage src={`https://placehold.co/100x100.png?text=${pupil?.avatar}`} data-ai-hint="person portrait" />
+                            <AvatarImage src={pupil?.avatarUrl || `https://placehold.co/100x100.png?text=${pupil?.avatar}`} data-ai-hint="person portrait" />
                             <AvatarFallback>{pupil?.avatar}</AvatarFallback>
                             </Avatar>
                             <div className="flex-grow min-w-0">

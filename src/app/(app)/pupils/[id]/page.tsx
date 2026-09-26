@@ -357,7 +357,7 @@ export default function PupilDetailPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center gap-4 pb-4">
                         <Avatar className="h-16 w-16">
-                            <AvatarImage src={`https://placehold.co/100x100.png?text=${pupil.avatar}`} data-ai-hint="person portrait"/>
+                            <AvatarImage src={pupil.avatarUrl || `https://placehold.co/100x100.png?text=${pupil.avatar}`} data-ai-hint="person portrait"/>
                             <AvatarFallback>{pupil.avatar}</AvatarFallback>
                         </Avatar>
                         <div>
