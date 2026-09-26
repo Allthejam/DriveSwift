@@ -1,14 +1,13 @@
-
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, ArrowLeft, Edit } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
-export default function CookiePolicyPage() {
+function CookiePolicyContent() {
     const searchParams = useSearchParams();
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
@@ -25,7 +24,7 @@ export default function CookiePolicyPage() {
                         <span className="font-bold">DriveSwift</span>
                     </Link>
                     <div className="flex flex-1 items-center justify-end space-x-2">
-                         <Button variant="outline" asChild>
+                        <Button variant="outline" asChild>
                             <Link href="/">
                                 <ArrowLeft className="mr-2" />
                                 Back to Home
@@ -51,40 +50,42 @@ export default function CookiePolicyPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-3xl">Cookie Policy</CardTitle>
-                            <CardDescription>Last updated: {new Date().toLocaleDateString()}</CardDescription>
                         </CardHeader>
                         <CardContent className="prose max-w-none dark:prose-invert">
-                            <p>This Cookie Policy explains what Cookies are and how We use them. You should read this policy so You can understand what type of cookies We use, or the information We collect using Cookies and how that information is used.</p>
-                            <p>Cookies do not typically contain any information that personally identifies a user, but personal information that we store about You may be linked to the information stored in and obtained from Cookies. For further information on how We use, store and keep your personal data secure, see our Privacy Policy.</p>
-                            
-                            <h2>What are Cookies?</h2>
-                            <p>Cookies are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.</p>
+                            <p>This Cookie Policy explains how DriveSwift ("we", "us", and "our") uses cookies and similar technologies to recognise you when you visit our website at driveswift.com ("Website"). It explains what these technologies are and why we use them, as well as your rights to control our use of them.</p>
 
-                            <h2>Types of Cookies We Use</h2>
-                            <p>Cookies can be "Persistent" or "Session" Cookies. Persistent Cookies remain on your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close your web browser.</p>
-                            <p>We use both session and persistent Cookies for the purposes set out below:</p>
-                            <ul>
-                                <li>
-                                    <p><strong>Necessary / Essential Cookies</strong></p>
-                                    <p>Type: Session Cookies</p>
-                                    <p>Administered by: Us</p>
-                                    <p>Purpose: These Cookies are essential to provide You with services available through the Website and to enable You to use some of its features. They help to authenticate users and prevent fraudulent use of user accounts. Without these Cookies, the services that You have asked for cannot be provided, and We only use these Cookies to provide You with those services.</p>
-                                </li>
-                                <li>
-                                    <p><strong>Functionality Cookies</strong></p>
-                                    <p>Type: Persistent Cookies</p>
-                                    <p>Administered by: Us</p>
-                                    <p>Purpose: These Cookies allow us to remember choices You make when You use the Website, such as remembering your login details or language preference. The purpose of these Cookies is to provide You with a more personal experience and to avoid You having to re-enter your preferences every time You use the Website.</p>
-                                </li>
-                            </ul>
+                            <h2>What are cookies?</h2>
+                            <p>Cookies are small data files that are placed on your computer or mobile device when you visit a website. Cookies are widely used by website owners in order to make their websites work, or to work more efficiently, as well as to provide reporting information.</p>
 
-                             <h2>Your Choices Regarding Cookies</h2>
-                            <p>If You prefer to avoid the use of Cookies on the Website, first You must disable the use of Cookies in your browser and then delete the Cookies saved in your browser associated with this website. You may use this option for preventing the use of Cookies at any time.</p>
-                            <p>If You do not accept Our Cookies, You may experience some inconvenience in your use of the Website and some features may not function properly.</p>
+                            <h2>Why do we use cookies?</h2>
+                            <p>We use first-party and third-party cookies for several reasons. Some cookies are required for technical reasons in order for our Website to operate, and we refer to these as "essential" or "strictly necessary" cookies. Other cookies also enable us to track and target the interests of our users to enhance the experience on our Online Properties. Third parties serve cookies through our Website for advertising, analytics and other purposes.</p>
+
+                            <h2>Essential Cookies</h2>
+                            <p>These cookies are strictly necessary to provide you with services available through our Website and to use some of its features, such as access to secure areas. Because these cookies are strictly necessary to deliver the Website to you, cannot refuse them without impacting how our site functions. You can block or delete them by changing your browser settings however, as described below under the heading "How can I control cookies?".</p>
+
+                            <h2>Analytics and Customisation Cookies</h2>
+                            <p>These cookies collect information that is used either in aggregate form to help us understand how our Website is being used or how effective our marketing campaigns are, or to help us customise our Website for you in order to enhance your experience.</p>
+
+                            <h2>How can I control cookies?</h2>
+                            <p>You have the right to decide whether to accept or reject cookies. You can exercise your cookie preferences by clicking on the appropriate opt-out links provided in the cookie banner on our website or by setting your preferences in your web browser controls.</p>
+                            <p>Most web browsers allow you to control cookies through their settings preferences. However, if you limit the ability of websites to set cookies, you may worsen your overall user experience, since it will no longer be personalised to you. It may also stop you from saving customised settings like login information.</p>
+
+                            <h2>Updates to this Cookie Policy</h2>
+                            <p>We may update this Cookie Policy from time to time in order to reflect, for example, changes to the cookies we use or for other operational, legal or regulatory reasons. Please therefore re-visit this Cookie Policy regularly to stay informed about our use of cookies and related technologies.</p>
+
+                            <p className="text-sm text-muted-foreground mt-8">Last updated: May 2024</p>
                         </CardContent>
                     </Card>
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function CookiePolicyPage() {
+    return (
+        <Suspense fallback={<div className="flex min-h-screen items-center justify-center p-8 text-center text-muted-foreground">Loading Cookie Policy...</div>}>
+            <CookiePolicyContent />
+        </Suspense>
     );
 }

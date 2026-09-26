@@ -1,5 +1,6 @@
 import CmsPage from "@/app/cms/edit-dialogs";
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'DriveSwift | AI-Powered Platform for Driving Instructors',
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <CmsPage />;
+    return (
+      <Suspense fallback={<div className="flex min-h-screen items-center justify-center p-8 text-center text-muted-foreground">Loading DriveSwift...</div>}>
+        <CmsPage />
+      </Suspense>
+    );
 }

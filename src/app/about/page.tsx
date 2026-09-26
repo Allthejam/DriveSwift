@@ -1,18 +1,17 @@
-
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, ArrowLeft, Edit } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const Separator = () => (
     <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent my-8"></div>
 );
 
-export default function AboutPage() {
+function AboutContent() {
     const searchParams = useSearchParams();
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
@@ -85,5 +84,13 @@ export default function AboutPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function AboutPage() {
+    return (
+        <Suspense fallback={<div className="flex min-h-screen items-center justify-center p-8 text-center text-muted-foreground">Loading About Page...</div>}>
+            <AboutContent />
+        </Suspense>
     );
 }

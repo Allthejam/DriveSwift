@@ -1,14 +1,13 @@
-
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, ArrowLeft, Edit } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
-export default function TermsAndConditionsPage() {
+function TermsAndConditionsContent() {
     const searchParams = useSearchParams();
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
@@ -25,7 +24,7 @@ export default function TermsAndConditionsPage() {
                         <span className="font-bold">DriveSwift</span>
                     </Link>
                     <div className="flex flex-1 items-center justify-end space-x-2">
-                         <Button variant="outline" asChild>
+                        <Button variant="outline" asChild>
                             <Link href="/">
                                 <ArrowLeft className="mr-2" />
                                 Back to Home
@@ -51,33 +50,41 @@ export default function TermsAndConditionsPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-3xl">Terms and Conditions</CardTitle>
-                            <CardDescription>Last updated: {new Date().toLocaleDateString()}</CardDescription>
                         </CardHeader>
                         <CardContent className="prose max-w-none dark:prose-invert">
-                            <p>Please read these terms and conditions carefully before using Our Service.</p>
+                            <p>Welcome to DriveSwift. These terms and conditions outline the rules and regulations for the use of DriveSwift's Website and Services.</p>
 
-                            <h2>Interpretation and Definitions</h2>
-                            <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-                            
-                            <h2>Acknowledgment</h2>
-                            <p>These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.</p>
-                            <p>Your access to and use of the Service is conditioned on Your acceptance of and compliance with these Terms and Conditions. These Terms and Conditions apply to all visitors, users and others who access or use the Service.</p>
-                            <p>By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.</p>
+                            <h2>1. Acceptance of Terms</h2>
+                            <p>By accessing this website and using our services, we assume you accept these terms and conditions. Do not continue to use DriveSwift if you do not agree to take all of the terms and conditions stated on this page.</p>
 
-                            <h2>User Accounts</h2>
-                            <p>When You create an account with Us, You must provide Us information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of Your account on Our Service.</p>
-                            <p>You are responsible for safeguarding the password that You use to access the Service and for any activities or actions under Your password, whether Your password is with Our Service or a Third-Party Social Media Service.</p>
+                            <h2>2. Subscription and Payments</h2>
+                            <p>DriveSwift offers subscription-based services. You agree to pay all applicable fees associated with your chosen subscription plan. Subscriptions automatically renew unless cancelled prior to the renewal date.</p>
 
-                            <h2>Termination</h2>
-                            <p>We may terminate or suspend Your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.</p>
-                            <p>Upon termination, Your right to use the Service will cease immediately. If You wish to terminate Your account, You may simply discontinue using the Service.</p>
-                            
-                            <h2>Changes to These Terms and Conditions</h2>
-                            <p>We reserve the right, at Our sole discretion, to modify or replace these Terms at any time. If a revision is material We will make reasonable efforts to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at Our sole discretion.</p>
+                            <h2>3. User Accounts</h2>
+                            <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.</p>
+
+                            <h2>4. Data and Privacy</h2>
+                            <p>Your privacy is important to us. Please review our Privacy Policy and Cookie Policy to understand how we collect, use, and protect your personal information.</p>
+
+                            <h2>5. Limitation of Liability</h2>
+                            <p>In no event shall DriveSwift, nor any of its officers, directors, and employees, be held liable for anything arising out of or in any way connected with your use of this website or service.</p>
+
+                            <h2>6. Governing Law</h2>
+                            <p>These terms will be governed by and interpreted in accordance with the laws of the United Kingdom, and you submit to the non-exclusive jurisdiction of the state and federal courts located in the UK for the resolution of any disputes.</p>
+
+                            <p className="text-sm text-muted-foreground mt-8">Last updated: May 2024</p>
                         </CardContent>
                     </Card>
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function TermsAndConditionsPage() {
+    return (
+        <Suspense fallback={<div className="flex min-h-screen items-center justify-center p-8 text-center text-muted-foreground">Loading Terms & Conditions...</div>}>
+            <TermsAndConditionsContent />
+        </Suspense>
     );
 }

@@ -1,6 +1,7 @@
 
 "use client"
 
+import { Suspense } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -81,7 +82,9 @@ export default function PupilDashboardLayout({
         </div>
       </header>
       <main>
-        {children}
+        <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading pupil portal...</div>}>
+          {children}
+        </Suspense>
       </main>
     </div>
   )
