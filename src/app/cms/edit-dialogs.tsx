@@ -832,6 +832,30 @@ export default function CmsPage() {
     Autoplay({ delay: content.testimonials.autoplayDelay, stopOnInteraction: content.testimonials.stopOnHover })
   );
 
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isFirestoreLoaded, setIsFirestoreLoaded] = useState(false);
+
+  const handleFullSyncToDatabase = async () => {
+    setIsSyncing(true);
+    try {
+      await setDoc(doc(db, "cms", "landing_page"), content);
+      setIsFirestoreLoaded(true);
+      toast({
+        title: "Home Page Synced to Firestore!",
+        description: "All home page data has been successfully written to /cms/landing_page in Firestore.",
+      });
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      toast({
+        variant: "destructive",
+        title: "Sync Failed",
+        description: "Failed to write data to Firestore: " + err.message,
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
     setIsSuperAdmin(searchParams.get('instructorId') === 'super-admin');
   }, [searchParams]);
@@ -846,6 +870,12 @@ export default function CmsPage() {
             ...prev,
             ...docSnap.data()
           }));
+          setIsFirestoreLoaded(true);
+        } else {
+          // Document does not exist in Firestore yet -> seed initial content automatically
+          await setDoc(docRef, content);
+          setIsFirestoreLoaded(true);
+          console.log("Seeded initial landing page data to Firestore /cms/landing_page");
         }
       } catch (err) {
         console.error("Error loading CMS content from Firestore:", err);
@@ -862,6 +892,7 @@ export default function CmsPage() {
 
     try {
       await setDoc(doc(db, "cms", "landing_page"), updatedContent, { merge: true });
+      setIsFirestoreLoaded(true);
       toast({
         title: `${section.charAt(0).toUpperCase() + section.slice(1)} Section Saved!`,
         description: "Your changes have been saved to Firestore.",
@@ -925,9 +956,15 @@ export default function CmsPage() {
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-4">
              {isSuperAdmin && (
-              <Button variant="ghost" asChild>
-                <a href={`/dashboard?${searchParams.toString()}`}>Back to Dashboard</a>
-              </Button>
+              <>
+                <Button variant="outline" size="sm" onClick={handleFullSyncToDatabase} disabled={isSyncing} className="gap-2">
+                  <Save className="h-4 w-4 text-primary" />
+                  {isSyncing ? "Syncing to Firestore..." : "Sync Home Page to Firestore"}
+                </Button>
+                <Button variant="ghost" asChild>
+                  <a href={`/dashboard?${searchParams.toString()}`}>Back to Dashboard</a>
+                </Button>
+              </>
             )}
             <Button variant="ghost" asChild>
                 <Link href="/login">Log In</Link>
