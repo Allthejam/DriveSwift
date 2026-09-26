@@ -57,29 +57,29 @@ export function ImageUploader({
     try {
       const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`);
       
-      // Attempt Firebase Storage upload with a 3-second timeout fallback
+      // Attempt Firebase Storage upload with a 20-second timeout fallback
       const uploadPromise = (async () => {
         const snapshot = await uploadBytes(storageRef, file);
         return await getDownloadURL(snapshot.ref);
       })();
 
       const timeoutPromise = new Promise<string>((_, reject) =>
-        setTimeout(() => reject(new Error("Storage timeout")), 3000)
+        setTimeout(() => reject(new Error("Storage upload timed out")), 20000)
       );
 
       let finalUrl = "";
       try {
         finalUrl = await Promise.race([uploadPromise, timeoutPromise]);
         toast({
-          title: "Uploaded to Firebase Storage!",
-          description: `Image saved to Cloud Storage (${(file.size / 1024).toFixed(0)} KB).`,
+          title: "Saved to Firebase Storage!",
+          description: `Image stored in Cloud Storage bucket (${(file.size / 1024).toFixed(0)} KB).`,
         });
-      } catch (storageErr) {
-        console.warn("Firebase Storage unavailable or uninitialized. Falling back to instant Base64 format:", storageErr);
+      } catch (storageErr: any) {
+        console.warn("Firebase Storage upload skipped/failed. Falling back to Base64 format:", storageErr);
         finalUrl = await readAsDataURL(file);
         toast({
-          title: "Image Uploaded Successfully",
-          description: `Image processed and applied (${(file.size / 1024).toFixed(0)} KB).`,
+          title: "Image Uploaded (Base64 Fallback)",
+          description: `Image processed (${(file.size / 1024).toFixed(0)} KB). Ensure Firebase Storage is activated in Console for cloud storage links.`,
         });
       }
 

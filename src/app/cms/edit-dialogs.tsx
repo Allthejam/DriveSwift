@@ -27,6 +27,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUploader } from '@/components/ImageUploader';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 
 const icons: { [key in LandingPageFeature['icon']]: ComponentType<any> } = {
@@ -834,14 +836,44 @@ export default function CmsPage() {
     setIsSuperAdmin(searchParams.get('instructorId') === 'super-admin');
   }, [searchParams]);
 
-  const handleSaveSection = (section: SectionKeys, newContent: any) => {
-    setContent(produce(draft => {
-        draft[section] = newContent;
-    }));
-    toast({
-      title: `${section.charAt(0).toUpperCase() + section.slice(1)} Section Saved!`,
-      description: "Your changes have been updated.",
+  useEffect(() => {
+    async function loadCmsContent() {
+      try {
+        const docRef = doc(db, "cms", "landing_page");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setContent(prev => ({
+            ...prev,
+            ...docSnap.data()
+          }));
+        }
+      } catch (err) {
+        console.error("Error loading CMS content from Firestore:", err);
+      }
+    }
+    loadCmsContent();
+  }, []);
+
+  const handleSaveSection = async (section: SectionKeys, newContent: any) => {
+    const updatedContent = produce(content, draft => {
+      draft[section] = newContent;
     });
+    setContent(updatedContent);
+
+    try {
+      await setDoc(doc(db, "cms", "landing_page"), updatedContent, { merge: true });
+      toast({
+        title: `${section.charAt(0).toUpperCase() + section.slice(1)} Section Saved!`,
+        description: "Your changes have been saved to Firestore.",
+      });
+    } catch (err: any) {
+      console.error("Failed to save to Firestore:", err);
+      toast({
+        variant: "destructive",
+        title: "Save Error",
+        description: "Updated locally, but failed to write to Firestore: " + err.message,
+      });
+    }
   };
   
   const renderTextWithTag = (text: string, tag: Tag, className: string) => {
