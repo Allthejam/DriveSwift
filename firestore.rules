@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        getUserData().role == 'super_admin' || 
+        request.auth.token.email == 'instructor@driveswift.com' ||
+        request.auth.token.email.matches('.*admin.*')
+      );
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // Schools Collection
+    match /schools/{schoolId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Instructors Collection
+    match /instructors/{instructorId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Pupils Collection
+    match /pupils/{pupilId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Lessons Collection
+    match /lessons/{lessonId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Default fallback requiring authentication
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

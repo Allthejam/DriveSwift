@@ -1,15 +1,46 @@
-
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Car, Shield, Building, GraduationCap } from 'lucide-react';
+import { Car, Shield, Building, GraduationCap, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await login(email, password);
+      toast({
+        title: "Welcome Back!",
+        description: "Logged in successfully with Firebase.",
+      });
+      router.push('/dashboard');
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: err.message || "Invalid credentials. Please check your email and password.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="mx-auto w-full max-w-md">
@@ -21,10 +52,17 @@ export default function LoginPage() {
           <CardDescription>Log in to your DriveSwift account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="admin@driveswift.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center">
@@ -33,10 +71,23 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
             </div>
-            <Button type="submit" className="w-full">
-              Sign in
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                'Sign in'
+              )}
             </Button>
             <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{' '}
@@ -44,7 +95,7 @@ export default function LoginPage() {
                   Sign up
                 </Link>
             </div>
-          </div>
+          </form>
 
           <Separator className="my-6" />
 

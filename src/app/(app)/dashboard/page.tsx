@@ -21,9 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardPageContent from './dashboard-client-page';
 
-export default async function DashboardPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-    const instructorId = typeof searchParams.instructorId === 'string' ? searchParams.instructorId : undefined;
-    const schoolId = typeof searchParams.schoolId === 'string' ? searchParams.schoolId : undefined;
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+    const params = await searchParams;
+    const instructorId = typeof params.instructorId === 'string' ? params.instructorId : undefined;
+    const schoolId = typeof params.schoolId === 'string' ? params.schoolId : undefined;
     const isSuperAdmin = instructorId === 'super-admin';
 
     let props: any = { isSuperAdmin };
