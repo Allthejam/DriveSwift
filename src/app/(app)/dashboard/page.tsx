@@ -23,8 +23,14 @@ import DashboardPageContent from './dashboard-client-page';
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
     const params = await searchParams;
-    const instructorId = typeof params.instructorId === 'string' ? params.instructorId : undefined;
-    const schoolId = typeof params.schoolId === 'string' ? params.schoolId : undefined;
+    let instructorId = typeof params.instructorId === 'string' ? params.instructorId : undefined;
+    let schoolId = typeof params.schoolId === 'string' ? params.schoolId : undefined;
+
+    // Default fallback for logged-in users when no specific query params are present
+    if (!instructorId && !schoolId) {
+        instructorId = 'super-admin';
+    }
+
     const isSuperAdmin = instructorId === 'super-admin';
 
     let props: any = { isSuperAdmin };

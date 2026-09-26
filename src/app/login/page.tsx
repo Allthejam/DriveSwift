@@ -29,7 +29,7 @@ export default function LoginPage() {
         title: "Welcome Back!",
         description: "Logged in successfully with Firebase.",
       });
-      router.push('/dashboard');
+      router.push('/dashboard?instructorId=super-admin');
     } catch (err: any) {
       toast({
         variant: "destructive",
