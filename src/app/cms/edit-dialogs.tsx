@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Car, Shield, Bot, Calendar, Users, BarChart, Check, Edit, Save, Trash2, PlusCircle, AlertCircle, ChevronDown, Rocket, HelpCircle, Mail, Inbox, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Car, Shield, Bot, Calendar, Users, BarChart, Check, Edit, Save, Trash2, PlusCircle, AlertCircle, ChevronDown, Rocket, HelpCircle, Mail, Inbox, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { landingPageFeatures as initialFeatures, landingPageTestimonials as initialTestimonials, type LandingPageFeature, type LandingPageTestimonial, faqCategories as initialFaqCategories, type FaqCategory } from '@/lib/data';
@@ -49,6 +49,16 @@ const socialIcons: { [key: string]: ComponentType<any> } = {
 };
 
 type Tag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
+
+export type SeoContent = {
+    metaTitle: string;
+    metaDescription: string;
+    keywords: string;
+    ogTitle: string;
+    ogDescription: string;
+    ogImage: string;
+    canonicalUrl: string;
+};
 
 type PricingTierContent = {
     id: string;
@@ -96,6 +106,7 @@ type FooterLinkColumn = {
 };
 
 type SectionContent = {
+    seo: SeoContent;
     hero: { title: string; subtitle: string; socialProof: string; imageUrl: string; titleTag: Tag; subtitleTag: Tag, socialProofTag: Tag };
     features: { title: string; subtitle: string; headingTag: Tag; items: LandingPageFeature[]; };
     testimonials: { title: string; subtitle: string; headingTag: Tag; items: LandingPageTestimonial[]; autoplay: boolean; stopOnHover: boolean; autoplayDelay: number; };
@@ -283,6 +294,100 @@ function SectionEditDialog({ section, content, isOpen, onOpenChange, onSave }: S
     
     const renderContent = () => {
         switch(section) {
+            case 'seo':
+                const seoContent = (editedContent as SectionContent['seo']) || {
+                    metaTitle: '',
+                    metaDescription: '',
+                    keywords: '',
+                    ogTitle: '',
+                    ogDescription: '',
+                    ogImage: '',
+                    canonicalUrl: '',
+                };
+                return (
+                    <div className="space-y-6">
+                        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                            <h4 className="font-semibold text-lg flex items-center gap-2">
+                                <Globe className="h-5 w-5 text-primary" /> Search Engine Optimization (SEO)
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                                Configure page titles, meta descriptions, and search engine keywords for Google, Bing, and other search engines.
+                            </p>
+
+                            <div className="space-y-2">
+                                <Label>Meta Title (Browser Tab & Search Title)</Label>
+                                <Input 
+                                    value={seoContent.metaTitle} 
+                                    onChange={e => handleFieldChange('metaTitle', e.target.value)} 
+                                    placeholder="e.g. DriveSwift | AI Platform for Driving Instructors"
+                                />
+                                <span className="text-[11px] text-muted-foreground block">
+                                    Recommended: 50–60 characters (Current: {seoContent.metaTitle?.length || 0} chars)
+                                </span>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Meta Description (Search Result Snippet)</Label>
+                                <Textarea 
+                                    value={seoContent.metaDescription} 
+                                    onChange={e => handleFieldChange('metaDescription', e.target.value)} 
+                                    rows={3}
+                                    placeholder="Describe your site for Google search results..."
+                                />
+                                <span className="text-[11px] text-muted-foreground block">
+                                    Recommended: 150–160 characters (Current: {seoContent.metaDescription?.length || 0} chars)
+                                </span>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Target Keywords (Comma-separated)</Label>
+                                <Input 
+                                    value={seoContent.keywords} 
+                                    onChange={e => handleFieldChange('keywords', e.target.value)} 
+                                    placeholder="driving instructor app, ADI software, driving school software, lesson planner"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Canonical URL</Label>
+                                <Input 
+                                    value={seoContent.canonicalUrl} 
+                                    onChange={e => handleFieldChange('canonicalUrl', e.target.value)} 
+                                    placeholder="https://driveswift.app"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                            <h4 className="font-semibold text-lg">Social Share Cards (Open Graph / Twitter)</h4>
+                            <div className="space-y-2">
+                                <Label>Social Share Title (OG Title)</Label>
+                                <Input 
+                                    value={seoContent.ogTitle} 
+                                    onChange={e => handleFieldChange('ogTitle', e.target.value)} 
+                                    placeholder="Title shown when link is shared on Facebook, WhatsApp, LinkedIn"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Social Share Description (OG Description)</Label>
+                                <Textarea 
+                                    value={seoContent.ogDescription} 
+                                    onChange={e => handleFieldChange('ogDescription', e.target.value)} 
+                                    rows={2}
+                                />
+                            </div>
+
+                            <ImageUploader
+                                label="Social Share Image (OG Image Banner - 1200x630 recommended)"
+                                value={seoContent.ogImage}
+                                onChange={(url) => handleFieldChange('ogImage', url)}
+                                folder="cms/seo"
+                                maxSizeMB={5}
+                            />
+                        </div>
+                    </div>
+                );
             case 'hero':
                 const heroContent = editedContent as SectionContent['hero'];
                 return (
@@ -720,6 +825,15 @@ export default function CmsPage() {
   const [isPricingExpanded, setIsPricingExpanded] = useState(false);
   
   const [content, setContent] = useState<SectionContent>({
+    seo: {
+        metaTitle: "DriveSwift | AI-Powered Platform for Driving Instructors & Driving Schools",
+        metaDescription: "The all-in-one platform for modern UK driving instructors and driving schools. Manage your diary, pupil progress, payments, and generate AI lesson plans.",
+        keywords: "driving instructor app, ADI software, PDI syllabus, driving school diary, driving lesson planner, AI lesson generator",
+        ogTitle: "DriveSwift | AI-Powered Platform for Driving Instructors",
+        ogDescription: "Manage your driving school, track pupil progress, and generate AI lesson plans with DriveSwift.",
+        ogImage: "https://placehold.co/1200x630.png",
+        canonicalUrl: "https://driveswift.app",
+    },
     hero: {
         title: "The AI-Powered Platform for Modern Driving Instructors",
         subtitle: "Stop juggling spreadsheets and clunky software. DriveSwift brings everything you need to run your driving school into one smart, intuitive platform.",
@@ -884,6 +998,33 @@ export default function CmsPage() {
     loadCmsContent();
   }, []);
 
+  useEffect(() => {
+    if (!content.seo) return;
+    if (content.seo.metaTitle) {
+      document.title = content.seo.metaTitle;
+    }
+    
+    const updateMeta = (name: string, property: string, val?: string) => {
+      if (!val) return;
+      let el = name 
+        ? document.querySelector(`meta[name="${name}"]`) 
+        : document.querySelector(`meta[property="${property}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        if (name) el.setAttribute('name', name);
+        if (property) el.setAttribute('property', property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', val);
+    };
+
+    updateMeta('description', '', content.seo.metaDescription);
+    updateMeta('keywords', '', content.seo.keywords);
+    updateMeta('', 'og:title', content.seo.ogTitle || content.seo.metaTitle);
+    updateMeta('', 'og:description', content.seo.ogDescription || content.seo.metaDescription);
+    updateMeta('', 'og:image', content.seo.ogImage);
+  }, [content.seo]);
+
   const handleSaveSection = async (section: SectionKeys, newContent: any) => {
     const updatedContent = produce(content, draft => {
       draft[section] = newContent;
@@ -957,9 +1098,13 @@ export default function CmsPage() {
           <div className="flex flex-1 items-center justify-end space-x-4">
              {isSuperAdmin && (
               <>
+                <Button variant="outline" size="sm" onClick={() => setEditingSection('seo')} className="gap-2 border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:text-blue-400">
+                  <Globe className="h-4 w-4" />
+                  SEO Settings
+                </Button>
                 <Button variant="outline" size="sm" onClick={handleFullSyncToDatabase} disabled={isSyncing} className="gap-2">
                   <Save className="h-4 w-4 text-primary" />
-                  {isSyncing ? "Syncing to Firestore..." : "Sync Home Page to Firestore"}
+                  {isSyncing ? "Syncing..." : "Sync Home Page to Firestore"}
                 </Button>
                 <Button variant="ghost" asChild>
                   <a href={`/dashboard?${searchParams.toString()}`}>Back to Dashboard</a>
