@@ -26,6 +26,7 @@ import { Switch } from '@/components/ui/switch';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ImageUploader } from '@/components/ImageUploader';
 
 
 const icons: { [key in LandingPageFeature['icon']]: ComponentType<any> } = {
@@ -305,26 +306,13 @@ function SectionEditDialog({ section, content, isOpen, onOpenChange, onSave }: S
                             </div>
                             <div className="md:col-span-2"><Label>Social Proof Text</Label><Textarea value={heroContent.socialProof} onChange={e => handleFieldChange('socialProof', e.target.value)} /></div>
                         </div>
-                        <div className="p-4 border rounded-lg space-y-4">
-                            <Label>Hero Image</Label>
-                             <div className="relative aspect-video rounded-lg overflow-hidden border">
-                                <Image
-                                    src={heroContent.imageUrl}
-                                    alt="Hero background"
-                                    fill
-                                    className="object-cover"
-                                    data-ai-hint="driving lesson road"
-                                />
-                            </div>
-                            <Input id="hero-image-upload" type="file" className="mt-2" accept="image/*" disabled/>
-                             <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>Prototype Limitation</AlertTitle>
-                                <AlertDescription>
-                                    Image uploading is not functional. In a live app, ensure uploaded images are web-optimized and under 2MB.
-                                </AlertDescription>
-                            </Alert>
-                        </div>
+                        <ImageUploader
+                            label="Hero Image"
+                            value={heroContent.imageUrl}
+                            onChange={(url) => handleFieldChange('imageUrl', url)}
+                            folder="cms/hero"
+                            maxSizeMB={5}
+                        />
                     </div>
                 );
             case 'features':
@@ -540,26 +528,13 @@ function SectionEditDialog({ section, content, isOpen, onOpenChange, onSave }: S
                                             <Input value={item.buttonLink} onChange={e => handleImageTextChange(index, 'buttonLink', e.target.value)} />
                                     </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <Label>Image</Label>
-                                    <div className="relative aspect-square max-w-xs rounded-lg overflow-hidden border">
-                                        <Image
-                                            src={item.imageUrl}
-                                            alt="Feature image"
-                                            fill
-                                            className="object-cover"
-                                            data-ai-hint="driving school app"
-                                        />
-                                    </div>
-                                    <Input id={`img-upload-${index}`} type="file" className="mt-2" accept="image/*" disabled/>
-                                    <Alert variant="destructive">
-                                        <AlertCircle className="h-4 w-4" />
-                                        <AlertTitle>Prototype Limitation</AlertTitle>
-                                        <AlertDescription>
-                                            Image uploading is not functional.
-                                        </AlertDescription>
-                                    </Alert>
-                                </div>
+                                 <ImageUploader
+                                     label="Block Image"
+                                     value={item.imageUrl}
+                                     onChange={(url) => handleImageTextChange(index, 'imageUrl', url)}
+                                     folder="cms/features"
+                                     maxSizeMB={5}
+                                 />
                             </div>
                         ))}
                         <div className="pt-6 border-t">
