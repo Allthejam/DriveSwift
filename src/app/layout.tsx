@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/AuthContext";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 export const metadata: Metadata = {
   title: 'DriveSwift',
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <AuthProvider>
           {children}
+          <CookieConsentBanner />
           <Toaster />
         </AuthProvider>
       </body>

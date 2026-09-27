@@ -927,8 +927,16 @@ export default function CmsPage() {
                 links: [
                     { id: 'link-2-1', text: 'About Us', url: '/about' },
                     { id: 'link-2-2', text: 'Contact Us', url: '/contact' },
-                    { id: 'link-2-3', text: 'Privacy Policy', url: '/cookie-policy' },
-                    { id: 'link-2-4', text: 'Terms of Service', url: '/terms-and-conditions' },
+                ]
+            },
+            {
+                id: 'col-3',
+                title: 'Legal & Compliance',
+                links: [
+                    { id: 'link-3-1', text: 'Terms & Conditions', url: '/terms-and-conditions' },
+                    { id: 'link-3-2', text: 'Privacy Policy', url: '/privacy-policy' },
+                    { id: 'link-3-3', text: 'Cookie Policy', url: '/cookie-policy' },
+                    { id: 'link-3-4', text: 'Terms of Service', url: '/terms-of-service' },
                 ]
             }
         ],
