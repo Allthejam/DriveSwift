@@ -1,15 +1,15 @@
 
 "use client"
 
-import { useState, useEffect } from 'react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useEffect, useRef } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { instructors, type Instructor, type PricingTier, type PricingCategory, type CarDetails } from '@/lib/data';
-import { Edit, Mail, Phone, Save, PlusCircle, Trash2, Car, ArrowUp, ArrowDown, Bell, CalendarOff, Calendar, Moon, Tag, Sparkles, Clock, Layers, Star, Plus, Zap, Check } from 'lucide-react';
+import { Edit, Mail, Phone, Save, PlusCircle, Trash2, Car, ArrowUp, ArrowDown, Bell, CalendarOff, Calendar, Moon, Tag, Sparkles, Clock, Layers, Star, Plus, Zap, Check, Camera, Upload, ImageIcon, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
@@ -28,27 +28,76 @@ import { StripeConnectCard } from "@/components/StripeConnectCard";
 import { DriveSwiftSubscriptionCard } from "@/components/DriveSwiftSubscriptionCard";
 
 
-function EditProfileDialog({ settings, instructorName, instructorEmail, instructorPhone, onSave, onOpenChange }: { settings: Instructor['settings'], instructorName: string, instructorEmail: string, instructorPhone: string, onSave: (newName: string, newEmail: string, newPhone: string, newSettings: Instructor['settings']) => void, onOpenChange: (open: boolean) => void }) {
+function EditProfileDialog({ 
+    settings, 
+    instructorName, 
+    instructorEmail, 
+    instructorPhone,
+    instructorAvatarUrl,
+    onSave, 
+    onOpenChange 
+}: { 
+    settings: Instructor['settings'], 
+    instructorName: string, 
+    instructorEmail: string, 
+    instructorPhone: string, 
+    instructorAvatarUrl?: string,
+    onSave: (newName: string, newEmail: string, newPhone: string, newAvatarUrl: string, newSettings: Instructor['settings']) => void, 
+    onOpenChange: (open: boolean) => void 
+}) {
     const [currentSettings, setCurrentSettings] = useState(settings);
     const [name, setName] = useState(instructorName);
     const [email, setEmail] = useState(instructorEmail);
     const [phone, setPhone] = useState(instructorPhone);
-    const [carImageFile, setCarImageFile] = useState<File | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState(instructorAvatarUrl || '');
+    const [carImageUrl, setCarImageUrl] = useState(settings.carDetails.imageUrl || '');
+
+    const avatarInputRef = useRef<HTMLInputElement>(null);
+    const carInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // When the dialog opens, reset the state to the latest settings
+        // When the dialog opens, reset state to latest values
         setCurrentSettings(settings);
         setName(instructorName);
         setEmail(instructorEmail);
         setPhone(instructorPhone);
-        setCarImageFile(null);
-    }, [settings, instructorName, instructorEmail, instructorPhone]);
+        setAvatarUrl(instructorAvatarUrl || '');
+        setCarImageUrl(settings.carDetails.imageUrl || '');
+    }, [settings, instructorName, instructorEmail, instructorPhone, instructorAvatarUrl]);
 
     const handleInputChange = (section: keyof Instructor['settings'], field: string, value: any) => {
         if (section === 'carDetails' || section === 'rules' || section === 'holidayMode' || section === 'notifications') {
             setCurrentSettings(produce(draft => ({ ...draft, [section]: { ...draft[section], [field]: value }})));
         }
     }
+
+    const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                if (evt.target?.result) {
+                    setAvatarUrl(evt.target.result as string);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                if (evt.target?.result) {
+                    const resultUrl = evt.target.result as string;
+                    setCarImageUrl(resultUrl);
+                    handleInputChange('carDetails', 'imageUrl', resultUrl);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handlePriceChange = (id: string, key: keyof PricingTier, value: any) => {
         setCurrentSettings(produce(draft => ({
@@ -95,7 +144,10 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
     }
 
     const handleSave = () => {
-        onSave(name, email, phone, currentSettings);
+        const updatedSettings = produce(currentSettings, draft => {
+            draft.carDetails.imageUrl = carImageUrl || draft.carDetails.imageUrl;
+        });
+        onSave(name, email, phone, avatarUrl, updatedSettings);
         onOpenChange(false);
     }
     
@@ -117,7 +169,55 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
                 <div className="grid gap-8 p-1 pr-6">
                     {/* Personal Details */}
                     <div className="space-y-4">
-                        <h4 className="font-semibold text-lg border-b pb-2">Personal Details</h4>
+                        <h4 className="font-semibold text-lg border-b pb-2 flex items-center gap-2">
+                            <User className="h-5 w-5 text-primary" /> Personal Details & Profile Photo
+                        </h4>
+                        
+                        {/* Instructor Avatar Upload */}
+                        <div className="flex items-center gap-6 p-4 rounded-xl border bg-muted/30">
+                            <Avatar className="h-20 w-20 border-2 border-primary/20 shadow-sm relative overflow-hidden">
+                                <AvatarImage src={avatarUrl} alt={name} className="object-cover" />
+                                <AvatarFallback className="text-lg font-bold">
+                                    {name ? name.split(' ').map(n=>n[0]).join('') : 'DS'}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="space-y-2">
+                                <div>
+                                    <h5 className="font-semibold text-sm">Instructor Avatar Photo</h5>
+                                    <p className="text-xs text-muted-foreground">Upload a clear profile photo so students recognize you.</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        ref={avatarInputRef} 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden" 
+                                        onChange={handleAvatarFileChange} 
+                                    />
+                                    <Button 
+                                        type="button" 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => avatarInputRef.current?.click()} 
+                                        className="gap-1.5 text-xs"
+                                    >
+                                        <Camera className="h-3.5 w-3.5 text-primary" /> Upload Avatar Photo
+                                    </Button>
+                                    {avatarUrl && (
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            onClick={() => setAvatarUrl('')} 
+                                            className="text-xs text-destructive hover:bg-destructive/10"
+                                        >
+                                            Remove
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                          <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="name">Full Name</Label>
@@ -134,9 +234,11 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
                         </div>
                     </div>
 
-                    {/* Car Details */}
+                    {/* Car Details & Photo Upload */}
                     <div className="space-y-4">
-                        <h4 className="font-semibold text-lg border-b pb-2">Car Details</h4>
+                        <h4 className="font-semibold text-lg border-b pb-2 flex items-center gap-2">
+                            <Car className="h-5 w-5 text-primary" /> Instruction Vehicle & Photo
+                        </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
@@ -172,22 +274,59 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
                                     </div>
                                 </div>
                             </div>
-                             <div className="space-y-2">
-                                <Label>Car Photo</Label>
-                                <div className="relative aspect-video rounded-lg overflow-hidden border">
-                                    <Image
-                                        src="https://placehold.co/600x400/png?text=+"
-                                        alt="Instruction car"
-                                        fill
-                                        className="object-cover"
-                                        data-ai-hint="car"
+                             <div className="space-y-3">
+                                <Label className="flex items-center gap-2 font-medium">
+                                    <ImageIcon className="h-4 w-4 text-primary" /> Instruction Vehicle Photo
+                                </Label>
+                                <div className="relative aspect-video rounded-xl overflow-hidden border shadow-sm bg-muted/30">
+                                    {carImageUrl ? (
+                                        <Image
+                                            src={carImageUrl}
+                                            alt="Instruction car"
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4 text-center">
+                                            <Car className="h-10 w-10 mb-2 opacity-50" />
+                                            <p className="text-xs">No car photo uploaded yet</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        ref={carInputRef} 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden" 
+                                        onChange={handleCarFileChange} 
                                     />
+                                    <Button 
+                                        type="button" 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => carInputRef.current?.click()} 
+                                        className="gap-1.5 text-xs w-full sm:w-auto"
+                                    >
+                                        <Upload className="h-3.5 w-3.5 text-primary" /> Upload Vehicle Photo
+                                    </Button>
+                                    {carImageUrl && (
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            onClick={() => {
+                                                setCarImageUrl('');
+                                                handleInputChange('carDetails', 'imageUrl', '');
+                                            }} 
+                                            className="text-xs text-destructive hover:bg-destructive/10"
+                                        >
+                                            Remove
+                                        </Button>
+                                    )}
                                 </div>
-                                 <div>
-                                    <Input id="car-image-upload" type="file" onChange={handleCarImageChange} className="mt-2" accept="image/*" />
-                                    {carImageFile && <p className="text-xs text-muted-foreground mt-1">Selected: {carImageFile.name}</p>}
-                                    <p className="text-xs text-muted-foreground mt-1">Image upload is not functional in this prototype.</p>
-                                </div>
+                                <p className="text-[11px] text-muted-foreground">Students see this photo when booking lessons with you.</p>
                             </div>
                         </div>
                     </div>
@@ -418,14 +557,15 @@ export default function ProfilePage() {
         setInstructor(found);
     }, [instructorId]);
 
-    const handleSave = (newName: string, newEmail: string, newPhone: string, newSettings: Instructor['settings']) => {
+    const handleSave = (newName: string, newEmail: string, newPhone: string, newAvatarUrl: string, newSettings: Instructor['settings']) => {
         setInstructor(prev => {
             if (!prev) return undefined;
-            const updatedInstructor = {
+            const updatedInstructor: Instructor = {
                 ...prev,
                 name: newName,
                 email: newEmail,
                 phone: newPhone,
+                avatarUrl: newAvatarUrl,
                 settings: newSettings
             };
 
@@ -439,7 +579,7 @@ export default function ProfilePage() {
 
         toast({
             title: "Profile Updated",
-            description: "Your settings have been saved successfully."
+            description: "Your details, pricing, and photos have been saved successfully."
         });
     }
 
@@ -453,12 +593,23 @@ export default function ProfilePage() {
                 <Card>
                     <CardHeader className="flex flex-row items-start justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-4">
-                            <Avatar className="h-16 w-16">
-                                <AvatarFallback>{instructor.name.split(' ').map(n=>n[0]).join('')}</AvatarFallback>
-                            </Avatar>
+                            <div className="relative group cursor-pointer" onClick={() => setIsDialogOpen(true)}>
+                                <Avatar className="h-20 w-20 border-2 border-primary/20 shadow-sm overflow-hidden">
+                                    <AvatarImage src={instructor.avatarUrl} alt={instructor.name} className="object-cover" />
+                                    <AvatarFallback className="text-xl font-bold">
+                                        {instructor.name.split(' ').map(n=>n[0]).join('')}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <Camera className="h-6 w-6 text-white" />
+                                </div>
+                            </div>
                             <div>
-                                <CardTitle>{instructor.name}</CardTitle>
-                                <CardDescription>Instructor Profile</CardDescription>
+                                <CardTitle className="text-2xl">{instructor.name}</CardTitle>
+                                <CardDescription className="flex items-center gap-2 mt-1">
+                                    <Badge variant="outline" className="font-semibold">{instructor.accountType}</Badge>
+                                    <span>Instructor Profile</span>
+                                </CardDescription>
                             </div>
                         </div>
                         <DialogTrigger asChild>
@@ -583,11 +734,14 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
                         <div>
-                            <CardTitle className="flex items-center gap-2"><Car className="h-5 w-5" /> About Your Car</CardTitle>
+                            <CardTitle className="flex items-center gap-2"><Car className="h-5 w-5 text-primary" /> About Your Car</CardTitle>
                             <CardDescription>Details about your instruction vehicle.</CardDescription>
                         </div>
+                        <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)} className="gap-1.5 text-xs">
+                            <Upload className="h-3.5 w-3.5" /> Upload / Change Photos
+                        </Button>
                     </CardHeader>
                     <CardContent className="grid md:grid-cols-2 gap-6 items-start">
                         <div className="space-y-4">
@@ -618,12 +772,13 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="relative group aspect-video rounded-lg overflow-hidden">
+                        <div className="relative group aspect-video rounded-xl overflow-hidden border shadow-sm bg-muted/30">
                             <Image
-                                src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80"
+                                src={instructor.settings.carDetails.imageUrl || "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80"}
                                 alt="Instruction car"
                                 fill
                                 className="object-cover"
+                                unoptimized
                                 data-ai-hint="car"
                             />
                         </div>
@@ -635,6 +790,7 @@ export default function ProfilePage() {
                     instructorName={instructor.name}
                     instructorEmail={instructor.email}
                     instructorPhone={instructor.phone}
+                    instructorAvatarUrl={instructor.avatarUrl}
                     onSave={handleSave}
                     onOpenChange={setIsDialogOpen}
                 />

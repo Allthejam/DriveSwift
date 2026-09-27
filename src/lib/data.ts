@@ -44,6 +44,7 @@ export type CarDetails = {
     fuelType: string;
     colour: string;
     registration: string;
+    imageUrl?: string;
 }
 
 export type Address = {
@@ -76,6 +77,7 @@ export type Instructor = {
     name: string;
     email: string;
     phone: string;
+    avatarUrl?: string;
     address?: Address;
     registrationNumber: string;
     accountType: 'PDI' | 'ADI';
@@ -238,6 +240,7 @@ export let instructors: Instructor[] = [
         name: 'Alex Johnson', 
         email: 'instructor@driveswift.com',
         phone: '07123456789',
+        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
         registrationNumber: '123456', 
         accountType: 'ADI',
         status: 'approved',
@@ -250,7 +253,7 @@ export let instructors: Instructor[] = [
                 { id: 'p5', label: 'Practical Test Day Package', price: 130, duration: '2.5 Hours', category: 'Test Day', description: 'Includes 1-hour pre-test warmup, car hire for practical test, and dropoff.' },
             ],
             rules: { minLessonDurationMinutes: 60 },
-            carDetails: { make: "Ford", model: "Focus", transmission: "Manual", fuelType: "Petrol", colour: "Blue", registration: "AB21 CDE" },
+            carDetails: { make: "Ford", model: "Focus", transmission: "Manual", fuelType: "Petrol", colour: "Blue", registration: "AB21 CDE", imageUrl: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80" },
             holidayMode: { enabled: false, startDate: null, endDate: null },
             notifications: { email: true, push: true }
         }
