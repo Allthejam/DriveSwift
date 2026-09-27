@@ -1101,16 +1101,44 @@ export default function CmsPage() {
     );
   };
 
-  const handleNewsletterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email');
-    toast({
+    const email = formData.get('email') as string;
+    if (!email || !email.includes('@')) return;
+
+    try {
+      const subId = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      await setDoc(doc(db, "newsletter_subscribers", subId), {
+        email,
+        status: "Subscribed",
+        source: "Landing Page Footer",
+        date: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+        brevoSynced: false,
+      }, { merge: true });
+
+      // Call Brevo subscription API
+      fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      }).catch(err => console.warn("Background Brevo sync error:", err));
+
+      toast({
         title: "Subscribed!",
-        description: `Thanks for subscribing, ${email}!`,
-    });
-    e.currentTarget.reset();
-  }
+        description: `Thanks for subscribing, ${email}! You're now on our mailing list.`,
+      });
+      e.currentTarget.reset();
+    } catch (err: any) {
+      console.error("Newsletter subscription error:", err);
+      toast({
+        variant: "destructive",
+        title: "Subscription Error",
+        description: "Could not save your subscription. Please try again.",
+      });
+    }
+  };
 
   const AdminEditButton = ({ onEdit }: { onEdit: () => void }) => {
     if (!isSuperAdmin) return null;
