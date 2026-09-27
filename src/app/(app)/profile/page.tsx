@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { produce } from 'immer';
 import { StripeConnectCard } from "@/components/StripeConnectCard";
+import { DriveSwiftSubscriptionCard } from "@/components/DriveSwiftSubscriptionCard";
 
 
 function EditProfileDialog({ settings, instructorName, instructorEmail, instructorPhone, onSave, onOpenChange }: { settings: Instructor['settings'], instructorName: string, instructorEmail: string, instructorPhone: string, onSave: (newName: string, newEmail: string, newPhone: string, newSettings: Instructor['settings']) => void, onOpenChange: (open: boolean) => void }) {
@@ -442,7 +443,8 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        <div className="mt-6">
+                        <div className="mt-6 space-y-6">
+                            <DriveSwiftSubscriptionCard currentTier="school" status="active" />
                             <StripeConnectCard instructorId={instructor.id} email={instructor.email} />
                         </div>
                     </div>
