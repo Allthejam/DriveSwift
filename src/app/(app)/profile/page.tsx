@@ -150,12 +150,6 @@ function EditProfileDialog({
         onSave(name, email, phone, avatarUrl, updatedSettings);
         onOpenChange(false);
     }
-    
-    const handleCarImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setCarImageFile(e.target.files[0]);
-        }
-    }
 
     return (
         <DialogContent className="sm:max-w-4xl">
