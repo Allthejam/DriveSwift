@@ -25,10 +25,16 @@ export const subscriptionTierPrices: Record<School['subscriptionTier'], number> 
 };
 
 
+export type PricingCategory = 'Standard' | 'Block Booking' | 'Intensive Package' | 'Advanced Training' | 'Test Day' | 'Custom';
+
 export type PricingTier = {
     id: string;
     label: string;
     price: number;
+    duration?: string;
+    category?: PricingCategory;
+    description?: string;
+    isPopular?: boolean;
 }
 
 export type CarDetails = {
@@ -237,8 +243,11 @@ export let instructors: Instructor[] = [
         status: 'approved',
         settings: {
             pricing: [
-                { id: 'p1', label: 'Single Hour', price: 35 },
-                { id: 'p2', label: '10 Hour Block', price: 330 },
+                { id: 'p1', label: '1 Hour Standard Lesson', price: 38, duration: '1 Hour', category: 'Standard', description: 'Flexible 1-on-1 manual driving lesson.' },
+                { id: 'p2', label: '2 Hour Standard Lesson', price: 72, duration: '2 Hours', category: 'Standard', description: 'Recommended session length for faster progress.' },
+                { id: 'p3', label: '10 Hour Block Booking', price: 350, duration: '10 Hours', category: 'Block Booking', description: 'Save £30 compared to hourly rates. Ideal for regular learners.', isPopular: true },
+                { id: 'p4', label: 'Pass Plus Course', price: 240, duration: '6 Hours', category: 'Advanced Training', description: 'Post-test motorway, night, and all-weather driving course.' },
+                { id: 'p5', label: 'Practical Test Day Package', price: 130, duration: '2.5 Hours', category: 'Test Day', description: 'Includes 1-hour pre-test warmup, car hire for practical test, and dropoff.' },
             ],
             rules: { minLessonDurationMinutes: 60 },
             carDetails: { make: "Ford", model: "Focus", transmission: "Manual", fuelType: "Petrol", colour: "Blue", registration: "AB21 CDE" },

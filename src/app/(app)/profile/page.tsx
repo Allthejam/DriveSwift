@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { instructors, type Instructor, type PricingTier, type CarDetails } from '@/lib/data';
-import { Edit, Mail, Phone, Save, PlusCircle, Trash2, Car, ArrowUp, ArrowDown, Bell, CalendarOff, Calendar, Moon } from 'lucide-react';
+import { instructors, type Instructor, type PricingTier, type PricingCategory, type CarDetails } from '@/lib/data';
+import { Edit, Mail, Phone, Save, PlusCircle, Trash2, Car, ArrowUp, ArrowDown, Bell, CalendarOff, Calendar, Moon, Tag, Sparkles, Clock, Layers, Star, Plus, Zap, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
@@ -21,6 +21,8 @@ import { Calendar as CalendarPicker } from "@/components/ui/calendar"
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { produce } from 'immer';
 import { StripeConnectCard } from "@/components/StripeConnectCard";
 import { DriveSwiftSubscriptionCard } from "@/components/DriveSwiftSubscriptionCard";
@@ -48,18 +50,30 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
         }
     }
 
-    const handlePriceChange = (id: string, key: 'label' | 'price', value: string | number) => {
+    const handlePriceChange = (id: string, key: keyof PricingTier, value: any) => {
         setCurrentSettings(produce(draft => ({
             ...draft,
             pricing: draft.pricing.map(tier =>
-                tier.id === id ? { ...tier, [key]: key === 'price' ? parseFloat(value as string) || 0 : value } : tier
+                tier.id === id ? { 
+                    ...tier, 
+                    [key]: key === 'price' ? (parseFloat(value as string) || 0) : value 
+                } : tier
             )
         })));
     };
 
-    const handleAddTier = () => {
-        setCurrentSettings(produce(draft => ({ ...draft, pricing: [...draft.pricing, { id: `tier-${Date.now()}`, label: '', price: 0 }] })));
-    }
+    const handleAddTier = (preset?: Partial<PricingTier>) => {
+        const newTier: PricingTier = {
+            id: `tier-${Date.now()}`,
+            label: preset?.label || 'Custom Driving Package',
+            price: preset?.price ?? 35,
+            duration: preset?.duration || '1 Hour',
+            category: preset?.category || 'Standard',
+            description: preset?.description || '',
+            isPopular: preset?.isPopular ?? false,
+        };
+        setCurrentSettings(produce(draft => ({ ...draft, pricing: [...draft.pricing, newTier] })));
+    };
 
     const handleRemoveTier = (id: string) => {
         setCurrentSettings(produce(draft => ({ ...draft, pricing: draft.pricing.filter(tier => tier.id !== id) })));
@@ -244,51 +258,138 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
                         </div>
                     </div>
 
-                    {/* Pricing */}
+                    {/* Flexible Lesson Pricing & Packages */}
                     <div className="space-y-4">
-                       <h4 className="font-semibold text-lg border-b pb-2">Lesson Pricing</h4>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[80px]">Order</TableHead>
-                                    <TableHead>Duration / Label</TableHead>
-                                    <TableHead>Price (£)</TableHead>
-                                    <TableHead className="w-[50px] text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {currentSettings.pricing.map((tier, index) => (
-                                    <TableRow key={tier.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-1">
-                                                <Button variant="ghost" size="icon" onClick={() => handleMove(index, 'up')} disabled={index === 0} className="h-8 w-8">
-                                                    <ArrowUp className="h-4 w-4" />
+                        <div className="flex items-center justify-between border-b pb-2 flex-wrap gap-2">
+                            <div>
+                                <h4 className="font-semibold text-lg flex items-center gap-2">
+                                    <Tag className="h-5 w-5 text-primary" /> Lesson Pricing & Custom Packages
+                                </h4>
+                                <p className="text-xs text-muted-foreground">Create custom rates for 1hr, 2hr, block bookings, intensive packages, pass plus, and test days.</p>
+                            </div>
+                        </div>
+
+                        {/* Quick Preset Buttons */}
+                        <div className="space-y-2 bg-muted/40 p-3 rounded-lg border">
+                            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                                <Zap className="h-3.5 w-3.5 text-amber-500" /> Quick Add Templates
+                            </Label>
+                            <div className="flex flex-wrap gap-2">
+                                <Button type="button" variant="outline" size="sm" onClick={() => handleAddTier({ label: '1 Hour Standard Lesson', price: 38, duration: '1 Hour', category: 'Standard', description: 'Standard 1-to-1 driving lesson.' })}>
+                                    <Plus className="h-3.5 w-3.5 mr-1" /> 1 Hour (£38)
+                                </Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => handleAddTier({ label: '2 Hour Standard Lesson', price: 72, duration: '2 Hours', category: 'Standard', description: 'Recommended 2-hour intensive session.' })}>
+                                    <Plus className="h-3.5 w-3.5 mr-1" /> 2 Hours (£72)
+                                </Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => handleAddTier({ label: '10 Hour Block Booking', price: 340, duration: '10 Hours', category: 'Block Booking', description: 'Save money with upfront block booking.', isPopular: true })}>
+                                    <Plus className="h-3.5 w-3.5 mr-1 text-primary" /> 10 Hr Block (£340) ⭐
+                                </Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => handleAddTier({ label: 'Pass Plus Course', price: 230, duration: '6 Hours', category: 'Advanced Training', description: 'Motorway, night, and adverse weather training.' })}>
+                                    <Plus className="h-3.5 w-3.5 mr-1" /> Pass Plus (£230)
+                                </Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => handleAddTier({ label: 'Practical Test Day Hire', price: 120, duration: '2.5 Hours', category: 'Test Day', description: 'Includes 1hr warmup and car hire for test.' })}>
+                                    <Plus className="h-3.5 w-3.5 mr-1" /> Test Day Hire (£120)
+                                </Button>
+                                <Button type="button" variant="secondary" size="sm" onClick={() => handleAddTier()}>
+                                    <PlusCircle className="h-3.5 w-3.5 mr-1" /> Custom Package
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Package Cards List */}
+                        <div className="space-y-3 mt-4">
+                            {currentSettings.pricing.map((tier, index) => (
+                                <div key={tier.id} className={cn("p-4 border rounded-xl space-y-3 transition-all", tier.isPopular ? "border-primary/50 bg-primary/5 shadow-sm" : "bg-card")}>
+                                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-0.5 border rounded-md p-0.5 bg-background">
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => handleMove(index, 'up')} disabled={index === 0} className="h-7 w-7">
+                                                    <ArrowUp className="h-3.5 w-3.5" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleMove(index, 'down')} disabled={index === currentSettings.pricing.length - 1} className="h-8 w-8">
-                                                    <ArrowDown className="h-4 w-4" />
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => handleMove(index, 'down')} disabled={index === currentSettings.pricing.length - 1} className="h-7 w-7">
+                                                    <ArrowDown className="h-3.5 w-3.5" />
                                                 </Button>
                                             </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input value={tier.label} onChange={(e) => handlePriceChange(tier.id, 'label', e.target.value)} placeholder="e.g., Single Hour" />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input type="number" value={tier.price} onChange={(e) => handlePriceChange(tier.id, 'price', e.target.value)} className="w-28" placeholder="e.g., 35" />
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button variant="ghost" size="icon" onClick={() => handleRemoveTier(tier.id)}>
-                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            <span className="text-xs font-mono font-medium text-muted-foreground">#{index + 1}</span>
+                                            {tier.isPopular && (
+                                                <Badge variant="default" className="text-[10px] gap-1 px-2 py-0.5">
+                                                    <Star className="h-3 w-3 fill-current" /> Featured / Best Value
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center space-x-2 border rounded-lg px-2.5 py-1 bg-background">
+                                                <Switch 
+                                                    id={`popular-${tier.id}`} 
+                                                    checked={!!tier.isPopular} 
+                                                    onCheckedChange={(checked) => handlePriceChange(tier.id, 'isPopular', checked)} 
+                                                />
+                                                <Label htmlFor={`popular-${tier.id}`} className="text-xs cursor-pointer flex items-center gap-1">
+                                                    <Star className="h-3 w-3 text-amber-500" /> Highlight as Popular
+                                                </Label>
+                                            </div>
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveTier(tier.id)} className="h-8 w-8 text-destructive hover:bg-destructive/10">
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <div className="mt-4">
-                            <Button variant="outline" size="sm" onClick={handleAddTier}>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Add Tier
-                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                        <div className="md:col-span-5 space-y-1">
+                                            <Label className="text-xs">Package Title / Name</Label>
+                                            <Input 
+                                                value={tier.label} 
+                                                onChange={(e) => handlePriceChange(tier.id, 'label', e.target.value)} 
+                                                placeholder="e.g. 10 Hour Block Booking" 
+                                            />
+                                        </div>
+                                        <div className="md:col-span-3 space-y-1">
+                                            <Label className="text-xs">Category</Label>
+                                            <Select 
+                                                value={tier.category || 'Standard'} 
+                                                onValueChange={(val: PricingCategory) => handlePriceChange(tier.id, 'category', val)}
+                                            >
+                                                <SelectTrigger className="h-9"><SelectValue placeholder="Category" /></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Standard">Standard Lesson</SelectItem>
+                                                    <SelectItem value="Block Booking">Block Booking</SelectItem>
+                                                    <SelectItem value="Intensive Package">Intensive Package</SelectItem>
+                                                    <SelectItem value="Advanced Training">Advanced Training</SelectItem>
+                                                    <SelectItem value="Test Day">Test Day Package</SelectItem>
+                                                    <SelectItem value="Custom">Custom</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="md:col-span-2 space-y-1">
+                                            <Label className="text-xs">Price (£)</Label>
+                                            <Input 
+                                                type="number" 
+                                                value={tier.price} 
+                                                onChange={(e) => handlePriceChange(tier.id, 'price', e.target.value)} 
+                                                placeholder="35" 
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2 space-y-1">
+                                            <Label className="text-xs">Duration</Label>
+                                            <Input 
+                                                value={tier.duration || ''} 
+                                                onChange={(e) => handlePriceChange(tier.id, 'duration', e.target.value)} 
+                                                placeholder="e.g. 2 Hours" 
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground">Description / Package Perks (optional)</Label>
+                                        <Input 
+                                            value={tier.description || ''} 
+                                            onChange={(e) => handlePriceChange(tier.id, 'description', e.target.value)} 
+                                            placeholder="e.g. Save £30 compared to hourly rates. Includes mock test feedback." 
+                                            className="h-8 text-xs"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -422,27 +523,56 @@ export default function ProfilePage() {
                     </div>
                     <div className="md:col-span-2">
                         <Card>
-                            <CardHeader>
-                                <CardTitle>Lesson Pricing</CardTitle>
-                                <CardDescription>Manage your lesson and block booking rates.</CardDescription>
+                            <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Tag className="h-5 w-5 text-primary" /> Lesson Rates & Packages
+                                    </CardTitle>
+                                    <CardDescription>Hourly rates, block discounts, intensive courses & test day packages.</CardDescription>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)} className="gap-1.5 text-xs">
+                                    <Edit className="h-3.5 w-3.5" /> Edit Rates & Packages
+                                </Button>
                             </CardHeader>
                             <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Duration / Label</TableHead>
-                                            <TableHead>Price (£)</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {instructor.settings.pricing.map((tier) => (
-                                            <TableRow key={tier.id}>
-                                                <TableCell className="font-medium">{tier.label}</TableCell>
-                                                <TableCell>{`£${tier.price.toFixed(2)}`}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    {instructor.settings.pricing.map((tier) => (
+                                        <div 
+                                            key={tier.id} 
+                                            className={cn(
+                                                "p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-all relative overflow-hidden",
+                                                tier.isPopular ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20" : "bg-card hover:border-muted-foreground/30"
+                                            )}
+                                        >
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                    <Badge 
+                                                        variant={tier.category === 'Block Booking' ? 'default' : tier.category === 'Advanced Training' ? 'secondary' : 'outline'}
+                                                        className="text-[10px] font-medium tracking-wide"
+                                                    >
+                                                        {tier.category || 'Standard'}
+                                                    </Badge>
+                                                    {tier.isPopular && (
+                                                        <Badge variant="default" className="text-[10px] gap-1 px-2 bg-amber-500 hover:bg-amber-600 text-white border-none">
+                                                            <Star className="h-3 w-3 fill-current" /> Best Value
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                <h5 className="font-semibold text-base leading-tight pt-1">{tier.label}</h5>
+                                                {tier.description && (
+                                                    <p className="text-xs text-muted-foreground line-clamp-2">{tier.description}</p>
+                                                )}
+                                            </div>
+                                            <div className="flex items-baseline justify-between border-t pt-2.5 mt-2">
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                    <Clock className="h-3.5 w-3.5 text-primary/70" />
+                                                    <span>{tier.duration || 'Flexible'}</span>
+                                                </div>
+                                                <span className="text-xl font-bold text-primary">£{tier.price.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </CardContent>
                         </Card>
 
