@@ -1,0 +1,20 @@
+const fs = require('fs');
+const path = require('path');
+
+const publicDir = path.join(process.cwd(), 'public');
+const iconsDir = path.join(publicDir, 'icons');
+
+if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+if (!fs.existsSync(iconsDir)) fs.mkdirSync(iconsDir, { recursive: true });
+
+const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#2563eb"/>
+  <path d="M120 320 C 140 240, 200 200, 256 200 C 312 200, 372 240, 392 320 L 392 360 L 120 360 Z" fill="#ffffff"/>
+  <circle cx="170" cy="360" r="36" fill="#1e293b"/>
+  <circle cx="342" cy="360" r="36" fill="#1e293b"/>
+  <path d="M170 200 L 210 130 L 302 130 L 342 200 Z" fill="#ffffff" opacity="0.9"/>
+  <text x="256" y="460" font-family="Arial, sans-serif" font-size="44" font-weight="bold" fill="#ffffff" text-anchor="middle">DriveSwift</text>
+</svg>`;
+
+fs.writeFileSync(path.join(iconsDir, 'icon.svg'), svgContent);
+console.log('SVG icon generated successfully in public/icons/icon.svg');

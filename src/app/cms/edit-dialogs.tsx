@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Car, Shield, Bot, Calendar, Users, BarChart, Check, Edit, Save, Trash2, PlusCircle, AlertCircle, ChevronDown, Rocket, HelpCircle, Mail, Inbox, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
+import { Car, Shield, Bot, Calendar, Users, BarChart, Check, Edit, Save, Trash2, PlusCircle, AlertCircle, ChevronDown, Rocket, HelpCircle, Mail, Inbox, Facebook, Twitter, Instagram, Linkedin, Globe, Smartphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { landingPageFeatures as initialFeatures, landingPageTestimonials as initialTestimonials, type LandingPageFeature, type LandingPageTestimonial, faqCategories as initialFaqCategories, type FaqCategory } from '@/lib/data';
@@ -27,6 +27,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUploader } from '@/components/ImageUploader';
+import { PwaInstallModal } from '@/components/PwaInstallModal';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -919,6 +920,7 @@ export default function CmsPage() {
                     { id: 'link-1-1', text: 'Features', url: '#features' },
                     { id: 'link-1-2', text: 'Pricing', url: '#pricing' },
                     { id: 'link-1-3', text: 'Testimonials', url: '#testimonials' },
+                    { id: 'link-1-4', text: 'Install App (PWA)', url: '#install-pwa' },
                 ]
             },
             {
@@ -949,6 +951,7 @@ export default function CmsPage() {
   });
 
   const [editingSection, setEditingSection] = useState<SectionKeys | null>(null);
+  const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
 
   const plugin = useRef(
     Autoplay({ delay: content.testimonials.autoplayDelay, stopOnInteraction: content.testimonials.stopOnHover })
@@ -1119,6 +1122,10 @@ export default function CmsPage() {
                 </Button>
               </>
             )}
+            <Button variant="outline" size="sm" onClick={() => setIsPwaModalOpen(true)} className="gap-1.5 text-xs border-primary/30 hover:bg-primary/5">
+                <Smartphone className="h-3.5 w-3.5 text-primary" />
+                Install App
+            </Button>
             <Button variant="ghost" asChild>
                 <Link href="/login">Log In</Link>
             </Button>
@@ -1378,17 +1385,32 @@ export default function CmsPage() {
                     </div>
                 </div>
                 <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
-                     {content.footer.columns.map((column) => (
+                      {content.footer.columns.map((column) => (
                         <div key={column.id} className="space-y-4">
                             <h4 className="font-semibold text-foreground">{column.title}</h4>
                             <ul className="space-y-2">
-                                {column.links.map((link) => (
-                                    <li key={link.id}>
-                                        <Link href={link.url} className="text-muted-foreground hover:text-primary transition-colors">
-                                            {link.text}
-                                        </Link>
-                                    </li>
-                                ))}
+                                {column.links.map((link) => {
+                                    if (link.url === '#install-pwa' || link.url === '/install') {
+                                        return (
+                                            <li key={link.id}>
+                                                <button
+                                                    onClick={() => setIsPwaModalOpen(true)}
+                                                    className="text-muted-foreground hover:text-primary transition-colors text-left flex items-center gap-1.5 font-medium cursor-pointer"
+                                                >
+                                                    <Smartphone className="h-3.5 w-3.5 text-primary" />
+                                                    {link.text}
+                                                </button>
+                                            </li>
+                                        );
+                                    }
+                                    return (
+                                        <li key={link.id}>
+                                            <Link href={link.url} className="text-muted-foreground hover:text-primary transition-colors">
+                                                {link.text}
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     ))}
@@ -1399,6 +1421,7 @@ export default function CmsPage() {
             </div>
         </div>
       </footer>
+      <PwaInstallModal isOpen={isPwaModalOpen} onOpenChange={setIsPwaModalOpen} />
     </div>
   );
 }

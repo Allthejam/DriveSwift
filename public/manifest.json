@@ -1,0 +1,25 @@
+{
+  "name": "DriveSwift | AI-Powered Platform for Driving Instructors",
+  "short_name": "DriveSwift",
+  "description": "The all-in-one AI platform for modern driving instructors and pupils. Manage your diary, pupil progress, payments, and AI lesson plans.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
