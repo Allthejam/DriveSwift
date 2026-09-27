@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { produce } from 'immer';
+import { StripeConnectCard } from "@/components/StripeConnectCard";
 
 
 function EditProfileDialog({ settings, instructorName, instructorEmail, instructorPhone, onSave, onOpenChange }: { settings: Instructor['settings'], instructorName: string, instructorEmail: string, instructorPhone: string, onSave: (newName: string, newEmail: string, newPhone: string, newSettings: Instructor['settings']) => void, onOpenChange: (open: boolean) => void }) {
@@ -440,6 +441,10 @@ export default function ProfilePage() {
                                 </Table>
                             </CardContent>
                         </Card>
+
+                        <div className="mt-6">
+                            <StripeConnectCard instructorId={instructor.id} email={instructor.email} />
+                        </div>
                     </div>
                 </div>
                 <Card>
