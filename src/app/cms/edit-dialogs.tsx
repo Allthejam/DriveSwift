@@ -281,6 +281,12 @@ function SectionEditDialog({ section, content, isOpen, onOpenChange, onSave }: S
             (draft as any).columns[colIndex].links[linkIndex][field] = value;
         }));
     };
+
+    const handleFooterColumnTitleChange = (colIndex: number, value: string) => {
+        setEditedContent(produce(draft => {
+            (draft as any).columns[colIndex].title = value;
+        }));
+    };
     
     const handleSocialLinkChange = (index: number, field: 'platform' | 'url', value: string) => {
         setEditedContent(produce(draft => {
@@ -719,7 +725,7 @@ function SectionEditDialog({ section, content, isOpen, onOpenChange, onSave }: S
                                     <div className="flex justify-between items-center mb-2">
                                         <div className="flex-grow pr-4">
                                             <Label>Column Title</Label>
-                                            <Input value={column.title} onChange={e => handleFieldChange(`columns[${colIndex}].title`, e.target.value)} className="font-semibold" />
+                                            <Input value={column.title} onChange={e => handleFooterColumnTitleChange(colIndex, e.target.value)} className="font-semibold" />
                                         </div>
                                         <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('columns', colIndex)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                     </div>
@@ -991,10 +997,37 @@ export default function CmsPage() {
         const docRef = doc(db, "cms", "landing_page");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setContent(prev => ({
-            ...prev,
-            ...docSnap.data()
-          }));
+          const dbData = docSnap.data() as Partial<SectionContent>;
+          
+          setContent(prev => {
+            const merged = { ...prev, ...dbData };
+            
+            // Smart Merge: Ensure PWA link & Legal column exist in footer columns
+            if (merged.footer && Array.isArray(merged.footer.columns)) {
+              let productCol = merged.footer.columns.find(c => c.title?.toLowerCase().includes('product') || c.id === 'col-1');
+              if (productCol) {
+                const hasPwaLink = productCol.links.some(l => l.url === '#install-pwa' || l.url === '/install');
+                if (!hasPwaLink) {
+                  productCol.links.push({ id: `link-pwa-${Date.now()}`, text: 'Install App (PWA)', url: '#install-pwa' });
+                }
+              }
+
+              let legalCol = merged.footer.columns.find(c => c.title?.toLowerCase().includes('legal') || c.id === 'col-3');
+              if (!legalCol) {
+                merged.footer.columns.push({
+                  id: 'col-3',
+                  title: 'Legal & Compliance',
+                  links: [
+                    { id: 'link-3-1', text: 'Terms & Conditions', url: '/terms-and-conditions' },
+                    { id: 'link-3-2', text: 'Privacy Policy', url: '/privacy-policy' },
+                    { id: 'link-3-3', text: 'Cookie Policy', url: '/cookie-policy' },
+                    { id: 'link-3-4', text: 'Terms of Service', url: '/terms-of-service' },
+                  ]
+                });
+              }
+            }
+            return merged;
+          });
           setIsFirestoreLoaded(true);
         } else {
           // Document does not exist in Firestore yet -> seed initial content automatically
