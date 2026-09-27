@@ -304,14 +304,17 @@ function EditProfileDialog({ settings, instructorName, instructorEmail, instruct
 
 export default function ProfilePage() {
     const searchParams = useSearchParams();
-    const instructorId = searchParams.get('instructorId') || '1';
+    const instructorId = searchParams.get('instructorId') || 'instructor-driveswift-alex';
     
-    const [instructor, setInstructor] = useState<Instructor | undefined>(instructors.find(i => i.id === instructorId));
+    const [instructor, setInstructor] = useState<Instructor | undefined>(() => {
+        return instructors.find(i => i.id === instructorId) || instructors.find(i => i.id === 'instructor-driveswift-alex') || instructors[0];
+    });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
-        setInstructor(instructors.find(i => i.id === instructorId));
+        const found = instructors.find(i => i.id === instructorId) || instructors.find(i => i.id === 'instructor-driveswift-alex') || instructors[0];
+        setInstructor(found);
     }, [instructorId]);
 
     const handleSave = (newName: string, newEmail: string, newPhone: string, newSettings: Instructor['settings']) => {
